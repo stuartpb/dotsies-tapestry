@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf8">
+  <title>Dotsies Tapestry</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="generator-halves" class="hbox fullpage">
+    <div id="text-side" class="vbox item">
+      <div id="parameter-controls" class="hbox">
+      </div>
+      <div id="style-entry" class="vbox">
+<textarea id="style-source">
+rect {fill: #ddd}
+.dit {fill: #bdb}
+</textarea>
+      </div>
+      <div id="text-entry" class="vbox item">
+        <textarea id="text-source" class="item"></textarea>
+      </div>
+    </div>
+    <div id="tapestry-side" class="vbox item">
+      <div id="tapestry-wrapper">
+        <svg id="tapestry" xmlns="http://www.w3.org/2000/svg"
+          width="0" height="0">
+          <style id="tapestry-style">
+          </style>
+          <g id="tapestry-blocks"></g>
+        </svg>
+      </div>
+    </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
