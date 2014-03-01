@@ -10,14 +10,9 @@ html, body {
   height: 100%;
 }
 
-svg {
-  /*margin: auto;*/
-}
-
 .hbox, .vbox {
   display: -webkit-flex;
   display: flex;
-  /*flex: 1*/
 }
 .vbox {
   -webkit-flex-direction: column;
@@ -35,7 +30,7 @@ svg {
 #tapestry-wrapper {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   overflow: auto;
 }
