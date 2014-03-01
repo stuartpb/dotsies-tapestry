@@ -11,9 +11,23 @@
       <div id="parameter-controls" class="hbox">
       </div>
       <div id="style-entry" class="vbox">
-<textarea id="style-source">
-rect {fill: #ddd}
-.dit {fill: #bdb}
+<textarea id="style-source" spellcheck="false">
+rect {fill: #ddd} /* base square style */
+.fill {fill: #bdb} /* dot square style */
+
+/* uncomment to display hints */
+/*.hint {fill: #fff}*/
+
+/* additional classes */
+.empty {} /* letter non-dot square style */
+.upper {} /* capital letter square style */
+.lower {} /* lower case letter square style */
+.letter {} /* letter square style */
+.space, .void {} /* space / no character square style */
+.content {} /* character-space square style */
+.gap {} /* between-lines square style */
+.over {} /* gap line over content */
+.extra {} /* gap for blank / last line */
 </textarea>
       </div>
       <div id="text-entry" class="vbox item">
@@ -24,6 +38,7 @@ rect {fill: #ddd}
       <div id="tapestry-wrapper">
         <svg id="tapestry" xmlns="http://www.w3.org/2000/svg"
           width="0" height="0">
+          <style>text{fill:none;text-anchor:middle}</style>
           <style id="tapestry-style">
           </style>
           <g id="tapestry-blocks"></g>

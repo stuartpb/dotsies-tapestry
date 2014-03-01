@@ -74,20 +74,34 @@ function tapestryify(group, str, width, opts) {
     return sq;
   }
 
+  function makeHintChar(char) {
+    var t = createSVGElement('text');
+    t.setAttribute('x', j * (sqw + gapx) + sqw/2);
+    t.setAttribute('y', gapy + top + sqh/2);
+    t.setAttribute('class', 'hint');
+    t.textContent = char;
+    return t;
+  }
+
   for (i=0; i < lines.length; i++) {
     var content = lines[i].match(/\S+/);
+    var char, dots;
     for (j=0; j < width; j++) {
       r=0;
-      group.appendChild(makeSq('interline'));
+      var char = content && lines[i][j];
+      var dots = char && dotsies[char.toLowerCase()];
+      var charclass = dots ?
+        (char == char.toLowerCase() ? 'lower' : 'upper') + ' letter'
+        : (char ? 'space' : 'void')
+      group.appendChild(makeSq('gap ' +
+        (content ? 'over ' + charclass : 'extra')));
       if (content) {
-        var char = lines[i][j];
-        var dots = char && dotsies[char.toLowerCase()];
         for (r=1; r<6; r++) {
           group.appendChild(makeSq(
-            dots ? (dots[r-1] ? 'dit' : 'wash' ) +
-              (char == char.toLowerCase() ? ' lower' : ' upper')
-            : 'space'));
+            (dots ? (dots[r-1] ? 'fill ' : 'empty ' ) : '')
+              + charclass + ' content'));
         }
+        if (dots) group.appendChild(makeHintChar(char));
       }
     }
     top += (sqh + gapy) * (content ? 6 : 1);
