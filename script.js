@@ -32,7 +32,9 @@ function createSVGElement(name) {
 }
 
 function clearLeftovers(el, n) {
-  el.children.length = n;
+  while(el.childNodes.length > n) {
+    el.removeChild(el.lastChild);
+  }
 }
 
 function alphify(str){
