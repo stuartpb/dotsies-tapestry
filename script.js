@@ -31,12 +31,8 @@ function createSVGElement(name) {
   return document.createElementNS("http://www.w3.org/2000/svg", name);
 }
 
-function clearElement(el) {
-  var fc = el.firstChild;
-  while (fc) {
-    el.removeChild(fc);
-    fc = el.firstChild;
-  }
+function clearLeftovers(el, n) {
+  el.children.length = n;
 }
 
 function alphify(str){
@@ -48,7 +44,7 @@ function getLongestWord(str) {
     function( m, n ) { return m.length > n.length ? m : n; }).length;
 }
 
-function tapestryify(group, str, width, opts) {
+function tapestryify(squares, chars, str, width, opts) {
   var lines = str.match(new RegExp('(.{0,' +width+ '})(\\s|$)','g'));
 
   var gapw = opts.gapw || opts.gap || 0;
@@ -58,12 +54,12 @@ function tapestryify(group, str, width, opts) {
   var sqw = opts.sqw || opts.size;
   var sqh = opts.sqh || opts.size;
 
-  clearElement(group);
-
   var top = 0, i=0, j=0, r=0;
 
+  var newSqs = 0;
+  var sqList = squares.children;
   function makeSq(className) {
-    var sq = createSVGElement('rect');
+    var sq = sqList[newSqs] || createSVGElement('rect');
     sq.setAttribute('x', j * (sqw + gapw));
     sq.setAttribute('y', r * (sqh + gaph) + top);
     sq.setAttribute('width', sqw);
@@ -71,16 +67,18 @@ function tapestryify(group, str, width, opts) {
     sq.setAttribute('rx', rx);
     sq.setAttribute('ry', ry);
     sq.setAttribute('class', className);
-    return sq;
+    if (++newSqs > sqList.length) squares.appendChild(sq);
   }
 
+  var newChars = 0;
+  var charList = chars.children;
   function makeHintChar(char) {
-    var t = createSVGElement('text');
+    var t = charList[newChars] || createSVGElement('text');
     t.setAttribute('x', j * (sqw + gapw) + sqw/2);
     t.setAttribute('y', gaph + top + sqh/2);
     t.setAttribute('class', 'hint');
     t.textContent = char;
-    return t;
+    if (++newChars > charList.length) chars.appendChild(t);
   }
 
   for (i=0; i < lines.length; i++) {
@@ -93,24 +91,26 @@ function tapestryify(group, str, width, opts) {
       var charclass = dots ?
         (char == char.toLowerCase() ? 'lower' : 'upper') + ' letter'
         : (char ? 'space' : 'void')
-      group.appendChild(makeSq('gap ' +
-        (content ? 'over ' + charclass : 'extra')));
+      makeSq('gap ' + (content ? 'over ' + charclass : 'extra'));
       if (content) {
         for (r=1; r<6; r++) {
-          group.appendChild(makeSq(
-            (dots ? (dots[r-1] ? 'fill ' : 'empty ' ) : '')
-              + charclass + ' content'));
+          makeSq((dots ? (dots[r-1] ? 'fill ' : 'empty ' ) : '')
+            + charclass + ' content');
         }
-        if (dots) group.appendChild(makeHintChar(char));
+        if (dots) makeHintChar(char);
       }
     }
     top += (sqh + gaph) * (content ? 6 : 1);
   }
 
+  clearLeftovers(squares,newSqs);
+  clearLeftovers(chars,newChars);
+
   return top;
 }
 
-var tapestry = document.getElementById('tapestry-blocks');
+var tapestrySqs = document.getElementById('tapestry-blocks');
+var tapestryChars = document.getElementById('tapestry-hints');
 var tapestrySvg = document.getElementById('tapestry');
 var tapestyle = document.getElementById('tapestry-style');
 var stylesrc = document.getElementById('style-source');
@@ -176,7 +176,7 @@ function reRenderSvg() {
   var str = alphify(textSource.value);
   var charWidth = +charwidthspin.value;
   var width = (opts.sqw + opts.gapw) * charWidth - opts.gapw;
-  var height = tapestryify(tapestry, str, charWidth, opts);
+  var height = tapestryify(tapestrySqs, tapestryChars, str, charWidth, opts);
   tapestrySvg.setAttribute('height', height + opts.gaph * 2);
   tapestrySvg.setAttribute('width', width + opts.gapw * 2);
   tapestrySvg.setAttribute('viewBox', [-opts.gapw, -opts.gaph,
