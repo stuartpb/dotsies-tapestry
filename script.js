@@ -113,9 +113,19 @@ function tapestryify(squares, chars, str, width, opts) {
 
 var tapestrySqs = document.getElementById('tapestry-blocks');
 var tapestryChars = document.getElementById('tapestry-hints');
+var tapestryWrapper = document.getElementById('tapestry-wrapper');
 var tapestrySvg = document.getElementById('tapestry');
 var tapestyle = document.getElementById('tapestry-style');
+var textSource = document.getElementById('text-source');
 var stylesrc = document.getElementById('style-source');
+var charwidthspin = document.getElementById('charwidth');
+var svgImg = document.getElementById('svg-image');
+var pngImg = document.getElementById('png-image');
+var saveSvgButton = document.getElementById('save-svg');
+var savePngButton = document.getElementById('save-png');
+var frame = document.getElementById('image-frame');
+var canvas = document.getElementById('raster-canvas');
+var ctx = canvas.getContext('2d');
 
 var opts = {};
 
@@ -157,21 +167,46 @@ function setUpOptUpdatePair(name, x, y) {
 setUpOptUpdatePair('sq','w','h');
 setUpOptUpdatePair('gap','w','h');
 setUpOptUpdatePair('r','x','y');
-
-var textSource = document.getElementById('text-source');
-
-var charwidthspin = document.getElementById('charwidth');
+stylesrc.addEventListener('input', updateTapeStyle);
+updateTapeStyle();
+textSource.addEventListener('input',textUpdated);
+charwidthspin.addEventListener('input',paramsUpdated);
 
 function textUpdated(evt){
   var str = alphify(textSource.value);
   var shortestWord = getLongestWord(str);
   charwidthspin.min = shortestWord;
   charwidthspin.value = Math.max(charwidthspin.value, charwidthspin.min);
-  reRenderSvg();
+  reRender();
 }
 
+function updateTapeStyle(evt) {
+  tapestyle.textContent = stylesrc.value;
+  reRender(0);
+}
+
+
 function paramsUpdated(){
-  return reRenderSvg();
+  return reRender();
+}
+
+var renderLevel = 0;
+
+function reRender(skip) {
+  var skip = (skip !== undefined ? (skip || 0) : -1)
+  if (skip < 0 && renderLevel >= 0) reRenderSvg();
+  if (skip < 1 && renderLevel >= 1) setSvgImage();
+  if (skip < 2 && renderLevel >= 2) drawImageToCanvas();
+  if (skip < 3 && renderLevel >= 3) putCanvasToPng();
+}
+
+function setRenderLevel(newLevel) {
+  var oldLevel = renderLevel;
+  renderLevel = newLevel;
+  reRender(oldLevel);
+  for (var i = 0; i < frame.children.length; i++) {
+    frame.children[i].hidden = (i != newLevel);
+  }
 }
 
 function reRenderSvg() {
@@ -185,12 +220,49 @@ function reRenderSvg() {
     width + opts.gapw*2, height + opts.gaph*2].join(' '));
 }
 
-textSource.addEventListener('input',textUpdated);
-charwidthspin.addEventListener('input',paramsUpdated);
-
-function updateTapeStyle(evt) {
-  tapestyle.textContent = stylesrc.value;
+function setSvgImage() {
+  svgImg.src = "data:image/svg+xml," + tapestryWrapper.innerHTML;
 }
 
-stylesrc.addEventListener('input', updateTapeStyle);
-updateTapeStyle();
+function drawImageToCanvas() {
+  var width = tapestrySvg.width.baseVal.value;
+  var height = tapestrySvg.height.baseVal.value;
+  canvas.width = width;
+  canvas.height = height;
+  ctx.clearRect(0, 0, width, height);
+  ctx.drawImage(svgImg, 0, 0, width, height);
+}
+
+function putCanvasToPng() {
+  pngImg.src = canvas.toDataURL();
+}
+
+function saveSvgReady() {
+  if (renderLevel >= 1) {
+    saveSvgButton.href = svgImg.src;
+  } else {
+    if (renderLevel < 0) reRenderSvg();
+    saveSvgButton.href = "data:image/svg+xml," + tapestryWrapper.innerHTML;
+  }
+}
+
+function savePngReady() {
+  if (renderLevel >= 3) {
+    savePngButton.href = pngImg.src;
+  } else {
+    if (renderLevel < 0) reRenderSvg();
+    if (renderLevel < 1) setSvgImage();
+    if (renderLevel < 2) drawImageToCanvas();
+    savePngButton.href = canvas.toDataURL();
+  }
+}
+
+document.getElementById('show-bare-svg').addEventListener('click',
+  setRenderLevel.bind(null, 0));
+document.getElementById('show-svg-image').addEventListener('click',
+  setRenderLevel.bind(null, 1));
+// renderLevel 2 is boring so we skip an interface element for it
+document.getElementById('show-png-image').addEventListener('click',
+  setRenderLevel.bind(null, 3));
+saveSvgButton.addEventListener('click', saveSvgReady);
+savePngButton.addEventListener('click', savePngReady);

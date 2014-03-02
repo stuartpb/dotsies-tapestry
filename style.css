@@ -52,7 +52,7 @@ height: 20px;
   flex: 1
 }
 
-#tapestry-wrapper {
+#image-frame {
   flex: 1;
   display: flex;
   align-items: flex-start;
@@ -60,7 +60,15 @@ height: 20px;
   overflow: auto;
 }
 
-#tapestry {
+#image-frame > * {
   flex-shrink: 0;
 }
 
+.button {
+    appearance: button;
+    -moz-appearance: button;
+    -webkit-appearance: button;
+    text-decoration: none; font: menu;
+    text-align: center; color: ButtonText;
+    display: inline-block; padding: 2px 8px;
+}

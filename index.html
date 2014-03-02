@@ -63,15 +63,33 @@ rect {fill: #ddd} /* base square style */
       </div>
     </div>
     <div id="tapestry-side" class="vbox item">
-      <div id="tapestry-wrapper">
-        <svg id="tapestry" xmlns="http://www.w3.org/2000/svg"
-          width="0" height="0">
-          <style>text{fill:none;text-anchor:middle}</style>
-          <style id="tapestry-style">
-          </style>
-          <g id="tapestry-blocks"></g>
-          <g id="tapestry-hints"></g>
-        </svg>
+      <div id="image-frame" class="preview item">
+        <div id="tapestry-wrapper" class="image">
+          <svg id="tapestry" xmlns="http://www.w3.org/2000/svg"
+            width="0" height="0">
+            <style>text{fill:none;text-anchor:middle}</style>
+            <style id="tapestry-style">
+            </style>
+            <g id="tapestry-blocks"></g>
+            <g id="tapestry-hints"></g>
+          </svg>
+        </div>
+        <div id="svg-image-wrapper" hidden>
+          <img id="svg-image">
+        </div>
+        <div id="raster-canvas-wrapper" hidden>
+          <canvas id="raster-canvas"></canvas>
+        </div>
+        <div id="png-image-wrapper" hidden>
+          <img id="png-image">
+        </div>
+      </div>
+      <div id="image-controls" class="hbox cline">
+        <input type="radio" id="show-bare-svg" name="image-level" checked>
+        <a href download="tapestry.svg" class="button item" id="save-svg">Save SVG</a>
+        <input type="radio" id="show-svg-image" name="image-level">
+        <a href download="tapestry.png" class="button item" id="save-png">Save PNG</a>
+        <input type="radio" id="show-png-image" name="image-level">
       </div>
     </div>
     </div>
