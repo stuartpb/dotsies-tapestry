@@ -51,8 +51,8 @@ function getLongestWord(str) {
 function tapestryify(group, str, width, opts) {
   var lines = str.match(new RegExp('(.{0,' +width+ '})(\\s|$)','g'));
 
-  var gapx = opts.xgap || opts.gap || 0;
-  var gapy = opts.ygap || opts.gap || 0;
+  var gapw = opts.gapw || opts.gap || 0;
+  var gaph = opts.gaph || opts.gap || 0;
   var rx = opts.rx || opts.r || 0;
   var ry = opts.ry || opts.r || 0;
   var sqw = opts.sqw || opts.size;
@@ -64,8 +64,8 @@ function tapestryify(group, str, width, opts) {
 
   function makeSq(className) {
     var sq = createSVGElement('rect');
-    sq.setAttribute('x', j * (sqw + gapx));
-    sq.setAttribute('y', r * (sqh + gapy) + top);
+    sq.setAttribute('x', j * (sqw + gapw));
+    sq.setAttribute('y', r * (sqh + gaph) + top);
     sq.setAttribute('width', sqw);
     sq.setAttribute('height', sqh);
     sq.setAttribute('rx', rx);
@@ -76,8 +76,8 @@ function tapestryify(group, str, width, opts) {
 
   function makeHintChar(char) {
     var t = createSVGElement('text');
-    t.setAttribute('x', j * (sqw + gapx) + sqw/2);
-    t.setAttribute('y', gapy + top + sqh/2);
+    t.setAttribute('x', j * (sqw + gapw) + sqw/2);
+    t.setAttribute('y', gaph + top + sqh/2);
     t.setAttribute('class', 'hint');
     t.textContent = char;
     return t;
@@ -104,7 +104,7 @@ function tapestryify(group, str, width, opts) {
         if (dots) group.appendChild(makeHintChar(char));
       }
     }
-    top += (sqh + gapy) * (content ? 6 : 1);
+    top += (sqh + gaph) * (content ? 6 : 1);
   }
 
   return top;
@@ -115,15 +115,76 @@ var tapestrySvg = document.getElementById('tapestry');
 var tapestyle = document.getElementById('tapestry-style');
 var stylesrc = document.getElementById('style-source');
 
-document.getElementById('text-source').addEventListener('input',
-function(evt){
-  var str = alphify(evt.target.value);
-  var charWidth = getLongestWord(str)
-  var width = (25+5)*charWidth-5;
-  var height = tapestryify(tapestry, str, charWidth, {size: 25, gap: 5})-5;
-  tapestrySvg.setAttribute('height',height);
-  tapestrySvg.setAttribute('width',width);
-});
+var opts = {};
+
+function setUpOptUpdatePair(name, x, y) {
+  var locker = document.getElementById(name + '-lock');
+  var xspin = document.getElementById(name + x + '-spinner');
+  var yspin = document.getElementById(name + y + '-spinner');
+  yspin.disabled = locker.checked;
+
+  locker.addEventListener('click', function toggleLock(evt){
+    yspin.disabled = locker.checked;
+    if (yspin.disabled) {
+      if (yspin.value != xspin.value) {
+        yspin.value = xspin.value;
+        opts[name + y] = +yspin.value;
+        paramsUpdated();
+      }
+    }
+  });
+
+  xspin.addEventListener('input', function changeX(evt) {
+    opts[name + x] = +xspin.value;
+    if (locker.checked) {
+      yspin.value = xspin.value;
+      opts[name + y] = +yspin.value;
+    }
+    paramsUpdated();
+  });
+
+  yspin.addEventListener('input', function changeY(evt) {
+    opts[name + y] = +yspin.value;
+    paramsUpdated();
+  })
+
+  opts[name + x] = +xspin.value;
+  opts[name + y] = +yspin.value;
+}
+
+setUpOptUpdatePair('sq','w','h');
+setUpOptUpdatePair('gap','w','h');
+setUpOptUpdatePair('r','x','y');
+
+var textSource = document.getElementById('text-source');
+
+var charwidthspin = document.getElementById('charwidth');
+
+function textUpdated(evt){
+  var str = alphify(textSource.value);
+  var shortestWord = getLongestWord(str);
+  charwidthspin.min = shortestWord;
+  charwidthspin.value = Math.max(charwidthspin.value, charwidthspin.min);
+  reRenderSvg();
+}
+
+function paramsUpdated(){
+  return reRenderSvg();
+}
+
+function reRenderSvg() {
+  var str = alphify(textSource.value);
+  var charWidth = +charwidthspin.value;
+  var width = (opts.sqw + opts.gapw) * charWidth - opts.gapw;
+  var height = tapestryify(tapestry, str, charWidth, opts);
+  tapestrySvg.setAttribute('height', height + opts.gaph * 2);
+  tapestrySvg.setAttribute('width', width + opts.gapw * 2);
+  tapestrySvg.setAttribute('viewBox', [-opts.gapw, -opts.gaph,
+    width + opts.gapw*2, height + opts.gaph*2].join(' '));
+}
+
+textSource.addEventListener('input',textUpdated);
+charwidthspin.addEventListener('input',paramsUpdated);
 
 function updateTapeStyle(evt) {
   tapestyle.textContent = stylesrc.value;

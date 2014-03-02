@@ -8,7 +8,35 @@
 <body>
   <div id="generator-halves" class="hbox fullpage">
     <div id="text-side" class="vbox item">
-      <div id="parameter-controls" class="hbox">
+      <div id="parameter-controls" class="hbox cline space-even">
+        <div id="word-length" class="hbox cline">
+          <label for="charwidth">Width:</label>
+          <input type="number" value="0" min="0"step="1" id="charwidth">
+        </div>
+        <div id="square-size" class="hbox cline">
+          <label>Square:</label>
+          <label for="sqw-spinner">W:</label>
+          <input type="number" value="25" min="0" step="any" id="sqw-spinner">
+          <input type="checkbox" checked id="sq-lock" alt="Lock">
+          <label for="sqh-spinner">H:</label>
+          <input type="number" value="25" min="0" step="any" id="sqh-spinner" disabled>
+        </div>
+        <div id="gap-size" class="hbox cline">
+          <label>Gap:</label>
+          <label for="gapw-spinner">W:</label>
+          <input type="number" value="5" step="any" id="gapw-spinner">
+          <input type="checkbox" checked id="gap-lock" alt="Lock">
+          <label for="gaph-spinner">H:</label>
+          <input type="number" value="5" step="any" id="gaph-spinner" disabled>
+        </div>
+        <div id="corner-radius" class="hbox cline">
+          <label>Radius:</label>
+          <label for="rx-spinner">X:</label>
+          <input type="number" value="0" min="0" step="any" id="rx-spinner">
+          <input type="checkbox" checked id="r-lock" alt="Lock">
+          <label for="ry-spinner">Y:</label>
+          <input type="number" value="0" min="0" step="any" id="ry-spinner" disabled>
+        </div>
       </div>
       <div id="style-entry" class="vbox">
 <textarea id="style-source" spellcheck="false">
