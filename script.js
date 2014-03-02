@@ -36,7 +36,7 @@ function clearLeftovers(el, n) {
 }
 
 function alphify(str){
-  return str.replace(/[^a-zA-Z\s]/,'')
+  return str.replace(/[^a-zA-Z\s]/g,'')
 }
 
 function getLongestWord(str) {
